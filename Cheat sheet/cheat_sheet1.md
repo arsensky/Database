@@ -62,3 +62,25 @@ The structure of a table is defined by its columns.
 - Maintains referential integrity (used by foreign keys)  
 - Improves performance (automatic index)  
 - Required for replication and synchronization  
+
+## Querying Data (lab 12)
+### WHERE clause 
+Common Operators:
+- **Comparison**: =, <> or != (not equal), >, <, >=, <=
+- **Logical**: `AND`, `OR`, `NOT`
+- **Range**: `BETWEEN` (inclusive range)
+- **Null Check**: `IS NULL`, `IS NOT NULL`
+
+### Pattern matching (LIKE, ILIKE)
+The LIKE and ILIKE operators are used in a WHERE clause to search for a specified pattern in a column.
+- `%` represents zero, one, or multiple characters.
+- `_` represents a single character.
+- `ILIKE` is a PostgreSQL-specific operator that is case-insensitive.
+
+### Regular expressions
+For more complex pattern matching than LIKE can handle,
+PostgreSQL offers powerful Regular Expression operators. The most common is ~.
+- `~`: Case-sensitive regular expression match
+- `~*`: Case-insensitive regular expression match
+- `!~`: Does not match (case-sensitive)
+- `!~*`: Does not match (case-insensitive)
