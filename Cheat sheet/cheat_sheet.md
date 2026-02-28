@@ -2,6 +2,7 @@
 The cheat sheet was created by me based on the lab materials to help me
 remember important information, commands, and other key details.
 
+---
 ## Connecting to PostgreSQL via psql (lab 3)
 `psql -h <host> -p <port> -U <username> -d <database>`
 
@@ -21,12 +22,14 @@ Example: `psql -U postgres -d mydb -h localhost -p 5432`
 - `\h` - help on SQL commands (for example: \h SELECT)
 - `\?` - list of all meta commands
 
+---
 ## SQL Syntax Basics (lab 4)
 SQL (*Structured Query Language*) is the standard language for interacting with relational databases.
 <br>It is case-insensitive for keywords but follows conventions: 
 - Keywords like **SELECT**, **FROM**, and **WHERE** are written in uppercase.
 - Table names, column names usually written in snake_case.
 
+---
 ## Tables (lab 6)
 The structure of a table is defined by its columns.
 <br>Each column has:
@@ -50,6 +53,7 @@ The structure of a table is defined by its columns.
 (e.g., CHECK (grade >= 0 AND grade <= 100)).
 - **FOREIGN KEY**: Enforces a link to the primary key in another table.
 
+---
 ## Primary Keys (lab 7)
 **Primary Key** – a column (or columns) that uniquely identifies each row in a table.
 
@@ -65,6 +69,46 @@ The structure of a table is defined by its columns.
 - Improves performance (automatic index)  
 - Required for replication and synchronization  
 
+---
+## Database Design Basics (lab 9)
+Note: Examples are provided in `lab9.sql`
+### Entity-Relationship Modeling
+Visually represent DB structure before implementation.
+- **Entity** → table (e.g. Student, Course)
+- **Attribute** → column (e.g. Name, Email); can be simple, composite, derived, or key
+- **Relationship** → how entities connect (1:M, M:M)
+
+### Normalization
+Reduces redundancy and improves data integrity.
+- **1NF** — atomic values, no repeating groups, unique rows
+- **2NF** — 1NF + no partial dependencies on composite PK
+- **3NF** — 2NF + no transitive dependencies between non-key attributes
+
+### Design Process
+1. **Requirements Analysis** — what data, who uses it
+2. **Conceptual Design** — high-level ER diagram
+3. **Logical Design** — tables, keys, normalization, data types
+4. **Physical Design** — indexes, partitioning, backup
+
+### Finding Entities & Attributes
+- Entities → look for **nouns** in requirements
+- Attributes → ask *"what do we need to store about this entity?"*
+
+### Example: Designing a Library Management System
+Note: Logical Design is provided on `lab9.sql`
+#### Requirements Analysis
+- Track books, authors, members, and borrowing history
+- Members can borrow multiple books
+- Books can have multiple authors
+- Track due dates and late fees
+
+#### Conceptual Design
+**Entities**: Book, Author, Member, Loan<br>
+**Relationships**:
+- Author WRITES Book (Many-to-Many)
+- Member BORROWS Book through Loan (One-to-Many)
+
+---
 ## Querying Data (lab 12)
 ### WHERE clause 
 Common Operators:
@@ -87,6 +131,7 @@ PostgreSQL offers powerful Regular Expression operators. The most common is ~.
 - `!~`: Does not match (case-sensitive)
 - `!~*`: Does not match (case-insensitive)
 
+---
 ## Advanced Querying (lab 15)
 Note: Examples are provided in `lab15.sql`
 ### Subqueries
@@ -171,3 +216,145 @@ This reduces the amount of data transferred and processed.
 - **Be cautious with `DISTINCT` and `UNION`:** They require extra processing to remove duplicates.
 Use `UNION ALL` if you know duplicates are impossible or acceptable.
 - **Use `LIMIT` for Testing:** When building a complex query, use `LIMIT 10` to get quick feedback instead of processing the entire table.
+
+---
+## Transactions and ACID Properties (lab 16)
+A **transaction** is a group of SQL operations treated as one unit of work.
+Either all operations succeed (**commit**) or none of them do (**rollback**).
+This ensures data consistency and integrity.
+
+Example: In a bank transfer, money is deducted from one account and added to another.
+Both actions must succeed, or neither happens.
+
+### ACID Properties
+**ACID** guarantees reliable database transactions.
+
+#### Atomicity – All succeed or all fail
+* All operations in a transaction succeed or none do
+* If one fails, the whole transaction is rolled back
+* “All-or-nothing” principle
+
+#### Consistency – Database stays valid
+* Database moves from one valid state to another
+* All rules, constraints, and triggers are satisfied
+* Data integrity is always maintained
+
+#### Isolation – Transactions don’t affect each other
+* Concurrent transactions don’t interfere with each other
+* Each transaction behaves as if it runs alone
+* Controlled by isolation levels
+
+#### Durability – Saved changes remain permanent
+* Once committed, changes are permanent
+* Data survives crashes or power loss
+* Stored in non-volatile memory
+
+### Isolation Levels
+#### READ UNCOMMITTED
+* Lowest level
+* Allows **dirty reads** (reading uncommitted data)
+* Rarely used
+
+#### READ COMMITTED (default)
+* Most common level
+* Prevents dirty reads
+* Allows **non-repeatable reads** and **phantom reads**
+
+#### REPEATABLE READ
+* Prevents dirty and non-repeatable reads
+* Same `SELECT` gives same results in one transaction
+* May allow phantom reads
+
+#### SERIALIZABLE
+* Highest level
+* Prevents dirty, non-repeatable, and phantom reads
+* Transactions behave as if executed one by one
+
+### Savepoints
+**Savepoints** create intermediate checkpoints inside a transaction.
+You can roll back to a savepoint without canceling the entire transaction.
+
+---
+## Data Import/Export and Backup (Lab 17)
+### COPY Command
+`COPY` is the fastest way to transfer large data between tables and files.
+
+#### Directions:
+- `COPY TO` – Export table to file  
+- `COPY FROM` – Import file to table  
+
+#### Features:
+- Supports CSV  
+- Export query results  
+- Custom delimiter, NULL, encoding  
+- Import specific columns  
+- Used in ETL and migration  
+
+### CSV Import/Export
+CSV is the most common data exchange format.
+
+#### Export:
+- With headers  
+- Custom delimiter/quote  
+- Force quote columns  
+
+#### Import:
+- Basic import (table must exist)  
+- Skip errors (`ON_ERROR IGNORE`)  
+- Set encoding (UTF8)  
+- Handle NULL and special characters  
+
+### pg_dump & pg_restore
+#### pg_dump:
+- Full database backup  
+- Compressed format (`-Fc`)  
+- Schema-only (`-s`) / Data-only (`-a`)  
+- Backup specific tables  
+
+#### pg_restore:
+- Restore full or partial backup  
+- Parallel restore (`-j`)  
+- View backup contents  
+
+### Full Backups
+Include data, schema, settings.  
+
+Tools: `pg_dump`, `pg_dumpall`  
+
+Best practice:
+- Automate backups  
+- Keep limited history  
+- Test restore regularly  
+
+### Incremental Backups
+Backup only changes using:
+- WAL  
+- `pg_basebackup`  
+- Continuous archiving  
+
+Benefits: less storage, faster process  
+
+### Point-in-Time Recovery (PITR)
+Restore database to a specific moment.
+
+Requires:
+- Base backup  
+- WAL archive  
+
+Targets:
+- Time  
+- Transaction ID  
+- Restore point  
+
+### Migration Strategies
+1. Dump & Restore  
+2. Logical Replication  
+3. Physical Replication  
+4. ETL Pipeline  
+
+### Best Practices
+- Check source data  
+- Test on small dataset  
+- Monitor process  
+- Validate results  
+- Partition large tables  

@@ -1,4 +1,4 @@
----- FOR DETAILED EXPLANATION SEE cheat_sheet1.md
+---- FOR DETAILED EXPLANATION SEE cheat_sheet.md
 -- 1. Subqueries example:
 SELECT first_name, last_name, salary
 FROM employees
