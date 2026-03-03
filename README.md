@@ -8,6 +8,7 @@ All required labs and additional study materials are organized into separate fol
 ## Labs
 - All **Labs (1–17)** are completed.
 - Labs are located in the **`Labs/`** directory.
+- **Lab 2** covers PostgreSQL and pgAdmin installation. It is instructional, so no separate folder was created.
 - **Lab 1** and **Lab 10** are short and theoretical, so they are written in **`.md`** format.
 - All other labs are implemented in **`.sql`** format.
 - The **`lab10_images/`** folder contains screenshots related to **Lab 10**.
